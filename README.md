@@ -38,37 +38,37 @@
 
 ### Frontend
 
-| Technology | Version | Purpose |
-|---|---|---|
-| React | 18 | UI library |
-| Vite | 5 | Build tool & dev server |
-| Tailwind CSS | 3 | Utility-first styling |
-| React Router DOM | v6 | Client-side routing |
-| Axios | 1.7 | HTTP client |
-| React Hot Toast | 2.4 | Notification toasts |
-| Context API | — | Global auth state management |
-| @hello-pangea/dnd | 16 | Drag & drop Kanban support |
-| Framer Motion | 12 | Animations & transitions |
-| Lucide React | — | Icon set |
+| Technology        | Version | Purpose                      |
+| ----------------- | ------- | ---------------------------- |
+| React             | 18      | UI library                   |
+| Vite              | 5       | Build tool & dev server      |
+| Tailwind CSS      | 3       | Utility-first styling        |
+| React Router DOM  | v6      | Client-side routing          |
+| Axios             | 1.7     | HTTP client                  |
+| React Hot Toast   | 2.4     | Notification toasts          |
+| Context API       | —       | Global auth state management |
+| @hello-pangea/dnd | 16      | Drag & drop Kanban support   |
+| Framer Motion     | 12      | Animations & transitions     |
+| Lucide React      | —       | Icon set                     |
 
 ### Backend
 
-| Technology | Version | Purpose |
-|---|---|---|
-| Python | 3.10+ | Runtime |
-| FastAPI | 0.110+ | Async web framework |
-| Uvicorn | 0.28+ | ASGI server |
-| Motor | 3.3+ | Async MongoDB driver |
-| Pydantic v2 | 2.6+ | Data validation & schemas |
-| pydantic-settings | 2.2+ | Environment config via `.env` |
-| python-jose | 3.3+ | JWT creation & verification |
-| passlib + bcrypt | — | Secure password hashing |
-| python-dotenv | 1.0+ | `.env` file loading |
+| Technology        | Version | Purpose                       |
+| ----------------- | ------- | ----------------------------- |
+| Python            | 3.10+   | Runtime                       |
+| FastAPI           | 0.110+  | Async web framework           |
+| Uvicorn           | 0.28+   | ASGI server                   |
+| Motor             | 3.3+    | Async MongoDB driver          |
+| Pydantic v2       | 2.6+    | Data validation & schemas     |
+| pydantic-settings | 2.2+    | Environment config via `.env` |
+| python-jose       | 3.3+    | JWT creation & verification   |
+| passlib + bcrypt  | —       | Secure password hashing       |
+| python-dotenv     | 1.0+    | `.env` file loading           |
 
 ### Database
 
-| Technology | Purpose |
-|---|---|
+| Technology    | Purpose                                 |
+| ------------- | --------------------------------------- |
 | MongoDB Atlas | Cloud-hosted NoSQL database (free tier) |
 
 ---
@@ -194,19 +194,19 @@ VITE_API_URL=http://localhost:5000/api
 
 ### Auth (`/api/auth`)
 
-| Method | Endpoint | Description | Auth |
-|---|---|---|---|
-| POST | `/api/auth/register` | Register a new user | Public |
-| POST | `/api/auth/login` | Login and receive JWT token | Public |
+| Method | Endpoint             | Description                 | Auth   |
+| ------ | -------------------- | --------------------------- | ------ |
+| POST   | `/api/auth/register` | Register a new user         | Public |
+| POST   | `/api/auth/login`    | Login and receive JWT token | Public |
 
 ### Tasks (`/api/tasks`)
 
-| Method | Endpoint | Description | Auth |
-|---|---|---|---|
-| GET | `/api/tasks` | Fetch all tasks for the logged-in user | ✅ Required |
-| POST | `/api/tasks` | Create a new task | ✅ Required |
-| PUT | `/api/tasks/{id}` | Update task (title, description, stage) | ✅ Required |
-| DELETE | `/api/tasks/{id}` | Delete a task by ID | ✅ Required |
+| Method | Endpoint          | Description                             | Auth        |
+| ------ | ----------------- | --------------------------------------- | ----------- |
+| GET    | `/api/tasks`      | Fetch all tasks for the logged-in user  | ✅ Required |
+| POST   | `/api/tasks`      | Create a new task                       | ✅ Required |
+| PUT    | `/api/tasks/{id}` | Update task (title, description, stage) | ✅ Required |
+| DELETE | `/api/tasks/{id}` | Delete a task by ID                     | ✅ Required |
 
 Full interactive documentation with request/response schemas is available at `/docs` (Swagger UI) or `/redoc` (ReDoc).
 
@@ -243,6 +243,7 @@ The following assumptions were made during design and development:
 **Decision:** Migrated the backend to Python/FastAPI with Motor (async MongoDB driver).
 
 **Rationale:**
+
 - FastAPI provides automatic OpenAPI/Swagger documentation out of the box — zero extra setup.
 - Pydantic v2 gives strong, declarative request/response validation with clear error messages.
 - Motor enables fully async database operations, which is critical for a non-blocking API server.
@@ -257,6 +258,7 @@ The following assumptions were made during design and development:
 **Decision:** The access token is stored in the browser's `localStorage`.
 
 **Rationale:**
+
 - Works cleanly in a pure SPA without needing backend cookie-handling logic.
 - Simplifies Axios setup — token is attached via an `Authorization: Bearer` header interceptor.
 
@@ -269,6 +271,7 @@ The following assumptions were made during design and development:
 **Decision:** Global auth state is managed with React's built-in Context API + `useReducer`.
 
 **Rationale:**
+
 - The app has a single global state concern: whether a user is logged in and their token.
 - Redux adds boilerplate (actions, reducers, store, selectors) that isn't justified at this scale.
 - Context API is built into React, requires no extra dependency.
@@ -282,6 +285,7 @@ The following assumptions were made during design and development:
 **Decision:** When a task is dragged between columns, the UI updates immediately before the API call completes.
 
 **Rationale:**
+
 - Instant visual feedback dramatically improves perceived performance.
 - The board feels smooth and responsive rather than waiting for a round trip.
 
@@ -294,6 +298,7 @@ The following assumptions were made during design and development:
 **Decision:** Used `motor` (async MongoDB driver) instead of the standard `pymongo`.
 
 **Rationale:**
+
 - FastAPI is an async framework built on `asyncio`/Starlette. Blocking sync I/O calls inside async route handlers would negate the async benefits and starve the event loop.
 - Motor is the official async wrapper for PyMongo and integrates seamlessly with `await`.
 
@@ -306,6 +311,7 @@ The following assumptions were made during design and development:
 **Decision:** The database is hosted on MongoDB Atlas (free tier M0 cluster).
 
 **Rationale:**
+
 - Zero setup for the database itself — no local MongoDB installation required.
 - Free tier is sufficient for development and small-scale production.
 - Built-in replication, backups, and monitoring via the Atlas dashboard.
@@ -319,6 +325,7 @@ The following assumptions were made during design and development:
 **Decision:** Frontend is scaffolded and built with Vite 5.
 
 **Rationale:**
+
 - Vite uses native ES modules and esbuild for near-instant Hot Module Replacement (HMR).
 - Build output is significantly smaller and faster than CRA's webpack-based output.
 - CRA is now deprecated/unmaintained by the React team.
@@ -367,10 +374,8 @@ The following assumptions were made during design and development:
 
 ## Live Links
 
-- 🌐 **Frontend**: `https://taskflow.vercel.app` *(replace with your deployed URL)*
-- 🔌 **Backend API**: `https://taskflow-api.onrender.com` *(replace with your deployed URL)*
+- 🌐 **Frontend**: `https://taskflow.vercel.app` _(replace with your deployed URL)_
+- 🔌 **Backend API**: `https://taskflow-api.onrender.com` _(replace with your deployed URL)_
 - 📄 **API Docs (Swagger)**: `https://taskflow-api.onrender.com/docs`
 
 ---
-
-*Built with ❤️ using React 18 + FastAPI + MongoDB Atlas*

@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, LogOut, Plus, Search, Bell, ChevronDown,
-  CheckSquare, Zap,
+  LogOut, Plus, Search, Bell, ChevronDown,
+  Zap, Sun, Moon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar = ({ onAddTask, searchQuery, onSearchChange }) => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const isDark = theme === 'dark';
 
   const handleLogout = () => {
     logout();
@@ -18,18 +21,23 @@ const Navbar = ({ onAddTask, searchQuery, onSearchChange }) => {
 
   const initials = user?.name
     ?.split(' ')
-    .map((w) => w[0])
+    .map(w => w[0])
     .join('')
     .slice(0, 2)
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/6"
-      style={{ background: 'rgba(8,11,20,0.85)', backdropFilter: 'blur(20px)' }}>
+    <header
+      className="sticky top-0 z-40 border-b transition-colors duration-300"
+      style={{
+        background: 'var(--c-navbar-bg)',
+        borderColor: 'var(--c-navbar-border)',
+        backdropFilter: 'blur(20px)',
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
 
-          {/* Logo */}
           <Link to="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
             <div className="relative w-8 h-8">
               <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -38,35 +46,57 @@ const Navbar = ({ onAddTask, searchQuery, onSearchChange }) => {
                 <Zap size={15} className="text-white" />
               </div>
             </div>
-            <span className="font-bold text-base tracking-tight hidden sm:block"
-              style={{ background: 'linear-gradient(135deg,#818cf8,#c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span
+              className="font-bold text-base tracking-tight hidden sm:block"
+              style={{
+                background: isDark
+                  ? 'linear-gradient(135deg,#818cf8,#c4b5fd)'
+                  : 'linear-gradient(135deg,#1d4ed8,#0d9488)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
               TaskFlow
             </span>
           </Link>
 
-          {/* Search */}
           <div className="flex-1 max-w-sm hidden md:block">
             <div className="relative">
-              <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Search
+                size={14}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                style={{ color: 'var(--c-search-ph)' }}
+              />
               <input
                 id="search-tasks"
                 type="text"
                 value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
+                onChange={e => onSearchChange(e.target.value)}
                 placeholder="Search tasks…"
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-white/8 bg-white/4 text-slate-300 placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all duration-200"
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border transition-all duration-200 focus:outline-none"
+                style={{
+                  background: 'var(--c-search-bg)',
+                  borderColor: 'var(--c-search-border)',
+                  color: 'var(--c-search-text)',
+                }}
               />
               {searchQuery && (
-                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 px-1.5 py-0.5 rounded border border-white/8 bg-white/4">
+                <kbd
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 rounded border"
+                  style={{
+                    color: 'var(--c-search-ph)',
+                    borderColor: 'var(--c-search-border)',
+                    background: 'var(--c-search-bg)',
+                  }}
+                >
                   ESC
                 </kbd>
               )}
             </div>
           </div>
 
-          {/* Right actions */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Add task */}
+
             <motion.button
               id="add-task-btn"
               whileHover={{ scale: 1.03 }}
@@ -78,27 +108,83 @@ const Navbar = ({ onAddTask, searchQuery, onSearchChange }) => {
               <span className="hidden sm:inline">New Task</span>
             </motion.button>
 
-            {/* Notification bell placeholder */}
-            <button className="btn-ghost w-9 h-9 p-0 rounded-xl relative">
+            <motion.button
+              id="theme-toggle-btn"
+              aria-label="Toggle theme"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={toggleTheme}
+              className="relative w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-200"
+              style={{
+                background: 'var(--c-user-btn-bg)',
+                borderColor: 'var(--c-user-btn-border)',
+                color: 'var(--c-sort-text)',
+              }}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {isDark ? (
+                  <motion.span
+                    key="sun"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute"
+                  >
+                    <Sun size={16} />
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="moon"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute"
+                  >
+                    <Moon size={16} />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+
+            <button
+              className="btn-ghost w-9 h-9 p-0 rounded-xl relative"
+              style={{ color: 'var(--c-sort-text)' }}
+            >
               <Bell size={16} />
               <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400" />
             </button>
 
-            {/* User menu */}
             <div className="relative">
               <button
                 id="user-menu-btn"
-                onClick={() => setUserMenuOpen((v) => !v)}
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-white/8 bg-white/4 hover:bg-white/8 hover:border-white/15 transition-all duration-200"
+                onClick={() => setUserMenuOpen(v => !v)}
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all duration-200"
+                style={{
+                  background: 'var(--c-user-btn-bg)',
+                  borderColor: 'var(--c-user-btn-border)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--c-user-btn-hover)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--c-user-btn-bg)'; }}
               >
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                  style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                  style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}
+                >
                   {initials}
                 </div>
-                <span className="text-sm text-slate-300 font-medium hidden sm:block max-w-[80px] truncate">
+                <span
+                  className="text-sm font-medium hidden sm:block max-w-[80px] truncate"
+                  style={{ color: 'var(--c-user-name)' }}
+                >
                   {user?.name?.split(' ')[0]}
                 </span>
-                <ChevronDown size={13} className={`text-slate-500 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  size={13}
+                  style={{ color: 'var(--c-chevron)' }}
+                  className={`transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`}
+                />
               </button>
 
               <AnimatePresence>
@@ -108,18 +194,29 @@ const Navbar = ({ onAddTask, searchQuery, onSearchChange }) => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50"
-                    style={{ background: 'rgba(12,17,35,0.98)', backdropFilter: 'blur(20px)' }}
+                    className="absolute right-0 top-full mt-2 w-52 rounded-xl border shadow-2xl overflow-hidden z-50"
+                    style={{
+                      background: 'var(--c-dropdown-bg)',
+                      borderColor: 'var(--c-dropdown-border)',
+                      backdropFilter: 'blur(20px)',
+                    }}
                   >
-                    <div className="px-4 py-3 border-b border-white/8">
-                      <p className="text-sm font-semibold text-slate-200 truncate">{user?.name}</p>
-                      <p className="text-xs text-slate-500 truncate mt-0.5">{user?.email}</p>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--c-dropdown-border)' }}>
+                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--c-dropdown-name)' }}>
+                        {user?.name}
+                      </p>
+                      <p className="text-xs truncate mt-0.5" style={{ color: 'var(--c-dropdown-email)' }}>
+                        {user?.email}
+                      </p>
                     </div>
                     <div className="p-1.5">
                       <button
                         id="logout-btn"
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors duration-150"
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors duration-150"
+                        style={{ color: 'var(--c-danger)' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(248,113,113,0.08)' : 'rgba(239,68,68,0.06)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                       >
                         <LogOut size={14} />
                         Sign out
@@ -132,16 +229,25 @@ const Navbar = ({ onAddTask, searchQuery, onSearchChange }) => {
           </div>
         </div>
 
-        {/* Mobile search */}
+        {/* mobile search bar */}
         <div className="md:hidden pb-3">
           <div className="relative">
-            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search
+              size={14}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2"
+              style={{ color: 'var(--c-search-ph)' }}
+            />
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={e => onSearchChange(e.target.value)}
               placeholder="Search tasks…"
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-white/8 bg-white/4 text-slate-300 placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+              className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border transition-all focus:outline-none"
+              style={{
+                background: 'var(--c-search-bg)',
+                borderColor: 'var(--c-search-border)',
+                color: 'var(--c-search-text)',
+              }}
             />
           </div>
         </div>

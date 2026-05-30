@@ -3,6 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError
 from app.utils.jwt_handler import JWTHandler
 from app.config.database import db_helper
+# pyrefly: ignore [missing-import]
 from bson import ObjectId
 
 security = HTTPBearer()

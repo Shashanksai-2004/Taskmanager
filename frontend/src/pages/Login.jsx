@@ -1,39 +1,37 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Mail, Lock, ArrowRight, Zap } from 'lucide-react';
+import { Mail, Lock, ArrowRight, CheckSquare } from 'lucide-react';
 import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import Loader from '../components/Loader';
 
-/* Left-side decorative feature list */
-const FEATURES = [
-  { icon: '⚡', text: 'Lightning-fast task management' },
-  { icon: '🎯', text: 'Kanban board with drag & drop' },
-  { icon: '🔒', text: 'Secure JWT authentication' },
-  { icon: '📱', text: 'Works on all your devices' },
-];
-
 const Login = () => {
-  const [form, setForm]   = useState({ email: '', password: '' });
-  const [errors, setErrs] = useState({});
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate  = useNavigate();
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
+
+  // already logged in — send them to the dashboard
+  if (user) return <Navigate to="/dashboard" replace />;
 
   const validate = () => {
-    const e = {};
-    if (!form.email.trim()) e.email = 'Email is required';
-    else if (!/^\S+@\S+\.\S+$/.test(form.email)) e.email = 'Invalid email';
-    if (!form.password) e.password = 'Password is required';
-    return e;
+    const errs = {};
+    if (!form.email.trim()) errs.email = 'Email is required';
+    else if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.email = 'Invalid email';
+    if (!form.password) errs.password = 'Password is required';
+    return errs;
   };
 
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length) { setErrs(errs); return; }
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      return;
+    }
     setLoading(true);
     try {
       const data = await authService.login(form);
@@ -42,169 +40,160 @@ const Login = () => {
       navigate('/dashboard');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed. Check your credentials.');
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((p) => ({ ...p, [name]: value }));
-    if (errors[name]) setErrs((p) => ({ ...p, [name]: '' }));
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* ── Left panel ── */}
+      {/* left side - decorative panel, hidden on mobile */}
       <motion.div
         initial={{ opacity: 0, x: -40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative flex-col justify-between p-12 overflow-hidden"
+        className="hidden lg:flex lg:w-[52%] relative flex-col justify-between p-12 overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #0d1225 0%, #0f172a 40%, #0a0f1e 100%)',
+          background: 'linear-gradient(140deg, #1d4ed8 0%, #1e40af 35%, #0d9488 100%)',
         }}
       >
-        {/* Glow orbs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-20 animate-glow-pulse"
-          style={{ background: 'radial-gradient(circle, #6366f1 0%, transparent 70%)', filter: 'blur(60px)' }} />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full opacity-15"
-          style={{ background: 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)', filter: 'blur(50px)' }} />
+        {/* grid pattern overlay */}
+        <div className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.15) 1px,transparent 1px)',
+            backgroundSize: '36px 36px',
+          }}
+        />
+        <div className="absolute top-[-80px] right-[-80px] w-[400px] h-[400px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[-60px] left-[-60px] w-[300px] h-[300px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(13,148,136,0.3) 0%, transparent 70%)' }} />
 
-        {/* Logo */}
         <div className="relative flex items-center gap-3">
-          <div className="relative w-10 h-10">
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600" />
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 blur-lg opacity-60" />
-            <div className="relative flex items-center justify-center w-full h-full">
-              <Zap size={18} className="text-white" />
-            </div>
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm border border-white/30">
+            <CheckSquare size={20} className="text-white" />
           </div>
-          <span className="text-xl font-bold"
-            style={{ background: 'linear-gradient(135deg,#818cf8,#c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            TaskFlow
-          </span>
+          <span className="text-xl font-bold text-white tracking-tight">TaskFlow</span>
         </div>
 
-        {/* Hero text */}
         <div className="relative">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6"
-              style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: '#a5b4fc' }}>
-              ✦ Manage tasks like a pro
-            </span>
-            <h1 className="text-4xl xl:text-5xl font-black leading-tight mb-5 text-white">
+            <h1 className="text-4xl xl:text-5xl font-black leading-tight mb-5 text-white drop-shadow-sm">
               Your workspace,<br />
-              <span style={{ background: 'linear-gradient(135deg,#818cf8 0%,#c4b5fd 50%,#67e8f9 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                supercharged.
-              </span>
+              <span className="opacity-80">organized.</span>
             </h1>
-            <p className="text-slate-400 text-lg leading-relaxed max-w-md">
-              Organize your work with a beautiful Kanban board. Drag, drop, and get things done.
+            <p className="text-blue-100 text-lg leading-relaxed max-w-md opacity-90">
+              Organize your work with a Kanban board. Drag, drop, and get things done.
             </p>
           </motion.div>
 
-          {/* Feature list */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-10 space-y-3.5"
-          >
-            {FEATURES.map((f, i) => (
+          <div className="mt-10 space-y-3.5">
+            {[
+              { icon: '⚡', text: 'Fast task management' },
+              { icon: '🎯', text: 'Kanban board with drag & drop' },
+              { icon: '🔒', text: 'JWT authentication' },
+              { icon: '📱', text: 'Works on all devices' },
+            ].map((item, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.08 }}
+                transition={{ delay: 0.4 + i * 0.1 }}
                 className="flex items-center gap-3"
               >
-                <span className="text-lg">{f.icon}</span>
-                <span className="text-sm text-slate-400">{f.text}</span>
+                <span className="text-lg">{item.icon}</span>
+                <span className="text-sm text-blue-100 opacity-90">{item.text}</span>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
 
-        {/* Bottom testimonial */}
         <div className="relative">
           <div className="p-4 rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <p className="text-sm text-slate-300 italic">"TaskFlow completely changed how our team manages sprints. The drag-and-drop is buttery smooth."</p>
+            style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>
+            <p className="text-sm text-white italic opacity-90">"TaskFlow changed how our team manages sprints. Really clean UI."</p>
             <div className="flex items-center gap-2 mt-3">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-xs font-bold text-white">A</div>
+              <div className="w-7 h-7 rounded-full bg-white/30 flex items-center justify-center text-xs font-bold text-white">A</div>
               <div>
-                <p className="text-xs font-semibold text-slate-300">Alex M.</p>
-                <p className="text-[10px] text-slate-600">Product Manager</p>
-              </div>
-              <div className="ml-auto flex gap-0.5">
-                {[...Array(5)].map((_, i) => <span key={i} className="text-amber-400 text-xs">★</span>)}
+                <p className="text-xs font-semibold text-white">Alex M.</p>
+                <p className="text-[10px] text-blue-200 opacity-70">Product Manager</p>
               </div>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* ── Right panel — form ── */}
+      {/* right side - login form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12"
-        style={{ background: 'rgba(8,11,20,1)' }}>
+        style={{ background: 'var(--c-bg)' }}>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
           className="w-full max-w-md"
         >
-          {/* Mobile logo */}
+          {/* show logo on mobile only */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-gradient-to-br from-indigo-500 to-violet-600">
-              <Zap size={15} className="text-white" />
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #1d4ed8, #0d9488)' }}>
+              <CheckSquare size={15} className="text-white" />
             </div>
-            <span className="font-bold text-base"
-              style={{ background: 'linear-gradient(135deg,#818cf8,#c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              TaskFlow
-            </span>
+            <span className="font-bold text-base" style={{ color: '#1d4ed8' }}>TaskFlow</span>
           </div>
 
-          <h2 className="text-2xl font-black text-white mb-1">Welcome back</h2>
-          <p className="text-slate-500 text-sm mb-8">Sign in to your account to continue</p>
+          <h2 className="text-2xl font-black mb-1" style={{ color: 'var(--c-text-1)' }}>Welcome back</h2>
+          <p className="text-sm mb-8" style={{ color: 'var(--c-text-3)' }}>Sign in to your account to continue</p>
 
-          <div className="rounded-2xl p-7"
-            style={{ background: 'rgba(15,20,40,0.8)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(16px)' }}>
+          <div className="rounded-2xl p-7" style={{ background: 'var(--c-bg-card)', border: '1.5px solid var(--c-border)', boxShadow: 'var(--shadow-md)' }}>
             <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-              {/* Email */}
               <div>
                 <label htmlFor="login-email" className="input-label flex items-center gap-1.5">
-                  <Mail size={11} className="text-indigo-400" /> Email
+                  <Mail size={11} style={{ color: '#1d4ed8' }} /> Email
                 </label>
                 <input
-                  id="login-email" type="email" name="email"
-                  value={form.email} onChange={handleChange}
-                  placeholder="you@example.com" autoComplete="email"
-                  className={`input-field ${errors.email ? 'border-rose-500/60' : ''}`}
+                  id="login-email"
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  className={`input-field ${errors.email ? '!border-red-400 focus:!ring-red-200' : ''}`}
                 />
-                {errors.email && <p className="mt-1.5 text-xs text-rose-400">⚠ {errors.email}</p>}
+                {errors.email && <p className="mt-1.5 text-xs text-red-500">⚠ {errors.email}</p>}
               </div>
 
-              {/* Password */}
               <div>
                 <label htmlFor="login-password" className="input-label flex items-center gap-1.5">
-                  <Lock size={11} className="text-indigo-400" /> Password
+                  <Lock size={11} style={{ color: '#1d4ed8' }} /> Password
                 </label>
                 <input
-                  id="login-password" type="password" name="password"
-                  value={form.password} onChange={handleChange}
-                  placeholder="Enter your password" autoComplete="current-password"
-                  className={`input-field ${errors.password ? 'border-rose-500/60' : ''}`}
+                  id="login-password"
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  className={`input-field ${errors.password ? '!border-red-400' : ''}`}
                 />
-                {errors.password && <p className="mt-1.5 text-xs text-rose-400">⚠ {errors.password}</p>}
+                {errors.password && <p className="mt-1.5 text-xs text-red-500">⚠ {errors.password}</p>}
               </div>
 
-              {/* Submit */}
               <motion.button
                 id="login-submit-btn"
-                type="submit" disabled={loading}
+                type="submit"
+                disabled={loading}
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 className="btn-primary w-full py-3 mt-1 text-base"
@@ -213,9 +202,9 @@ const Login = () => {
               </motion.button>
             </form>
 
-            <p className="text-center text-sm text-slate-500 mt-6">
+            <p className="text-center text-sm mt-6" style={{ color: 'var(--c-text-3)' }}>
               Don't have an account?{' '}
-              <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">
+              <Link to="/register" className="font-semibold transition-colors" style={{ color: 'var(--c-primary)' }}>
                 Create one free →
               </Link>
             </p>
