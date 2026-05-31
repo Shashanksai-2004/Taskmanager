@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LogOut, Plus, Search, Bell, ChevronDown,
@@ -13,10 +13,11 @@ const Navbar = ({ onAddTask, searchQuery, onSearchChange }) => {
   const { theme, toggleTheme } = useTheme();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const isDark = theme === 'dark';
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    window.location.href = '/login';
+    navigate('/login');
   };
 
   const initials = user?.name
