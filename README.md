@@ -374,8 +374,8 @@ The following assumptions were made during design and development:
 
 ## Live Links
 
-- 🌐 **Frontend**: `https://taskflow.vercel.app` _(replace with your deployed URL)_
-- 🔌 **Backend API**: `https://taskflow-api.onrender.com` _(replace with your deployed URL)_
-- 📄 **API Docs (Swagger)**: `https://taskflow-api.onrender.com/docs`
+- 🌐 **Frontend**: `https://taskmanager-inky-rho.vercel.app`
+- 🔌 **Backend API**: `https://taskmanager-fp9d.onrender.com`
+- 📄 **API Docs (Swagger)**: `https://taskmanager-fp9d.onrender.com/docs`
 
 ---
