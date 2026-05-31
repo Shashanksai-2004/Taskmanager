@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://taskmanager-g0kn.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://taskmanager-h8gz.onrender.com/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
