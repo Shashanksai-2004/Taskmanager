@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://taskmanager-h8gz.onrender.com',
+        target: 'https://taskmanager-fp9d.onrender.com',
         changeOrigin: true,
       },
     },
